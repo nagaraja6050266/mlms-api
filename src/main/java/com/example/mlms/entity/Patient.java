@@ -13,29 +13,16 @@ import java.time.LocalDateTime;
 @Setter
 public class Patient {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String patientId;
-
-    @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false)
-    private LocalDate dob;
-
-    @Column(nullable = false)
+    private String dob;
     private String gender;
-
-    @Column(nullable = false)
     private String contact;
-
     private String husbandName;
     private String fatherName;
     private String address;
-
-    @Column(nullable = false)
-    private LocalDate admissionDate;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private String admissionDate;
 
     // Getters and setters...
 }

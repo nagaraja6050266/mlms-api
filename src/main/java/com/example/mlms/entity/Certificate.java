@@ -16,7 +16,7 @@ public class Certificate {
     private String certificateId;
 
     @ManyToOne
-    @JoinColumn(name = "certificate_type_id", referencedColumnName = "certificate_type_id")
+    @JoinColumn(name = "certificate_type_id", referencedColumnName = "certificate_type_id") // Ensure correct column mapping
     private CertificateType certificateType;
 
     @Column(nullable = false)

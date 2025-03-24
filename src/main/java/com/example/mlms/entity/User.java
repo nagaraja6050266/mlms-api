@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer userId;
 
     @Column(nullable = false, unique = true)
@@ -25,11 +25,6 @@ public class User {
     private String passwordHash;
 
     private String role;
-
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 
     // Getters and setters...
 }
