@@ -8,13 +8,11 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 
-import com.example.mlms.utils.constants.ErrorConstants;
-
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomException extends Exception
 {
-	private int errCode= ErrorConstants.UNKNOWN_ERROR_CODE;
+	private int errCode= 1000;
 	private int statusCode= HttpStatus.INTERNAL_SERVER_ERROR.value();
 	private List<String> details=new ArrayList<>();
 	public CustomException(String message)

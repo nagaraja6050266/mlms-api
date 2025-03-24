@@ -7,16 +7,13 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 
-import com.example.mlms.utils.constants.ErrorConstants;
-
-@AllArgsConstructor
 @NoArgsConstructor
 
 public class ErrorResponse
 {
-	private int errCode= ErrorConstants.UNKNOWN_ERROR_CODE;
+	private int errCode= 1000;
 	private int statusCode= HttpStatus.INTERNAL_SERVER_ERROR.value();
-	private String message=ErrorConstants.UNKNOWN_ERROR;
+	private String message="Unknown Error";
 	private List<String> details;
 
 	public ErrorResponse(String message){
