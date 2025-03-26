@@ -68,16 +68,6 @@ public class CertificateController {
         return ResponseEntity.ok(certificateService.getCertificatesByType(type));
     }
 
-    @GetMapping("/issued-after/{date}")
-    public ResponseEntity<List<Certificate>> getCertificatesIssuedAfter(@PathVariable String date) {
-        return ResponseEntity.ok(certificateService.getCertificatesIssuedAfter(LocalDate.parse(date)));
-    }
-
-    @GetMapping("/validity/{id}")
-    public ResponseEntity<Boolean> isCertificateValid(@PathVariable Integer id) {
-        return ResponseEntity.ok(certificateService.isCertificateValid(id));
-    }
-
     @GetMapping("/count")
     public ResponseEntity<Map<String, Long>> getCertificateCountByType() {
         return ResponseEntity.ok(certificateService.getCertificateCountByType());
