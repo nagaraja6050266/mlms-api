@@ -143,7 +143,7 @@ public class CertificateService {
         List<CertificateType> defaultTypes = List.of(
             new CertificateType(1, "Birth Certificate", "Issued for birth registration"),
             new CertificateType(2, "Death Certificate", "Issued for death registration"),
-            new CertificateType(3, "dummyyy", "Issued for marriage registration"),
+            new CertificateType(3, "Atopsy Report", "Issued for atopsy reports"),
             new CertificateType(4, "Vaccination Certificate", "Issued for vaccination records"),
             new CertificateType(5, "Medical Fitness Certificate", "Issued for medical fitness verification"),
             new CertificateType(6, "Disability Certificate", "Issued for disability verification"),
