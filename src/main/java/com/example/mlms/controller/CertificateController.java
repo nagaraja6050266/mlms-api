@@ -20,7 +20,7 @@ public class CertificateController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Certificate> getCertificateById(@PathVariable String id) {
+    public ResponseEntity<Certificate> getCertificateById(@PathVariable Integer id) {
         return certificateService.getCertificateById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -32,7 +32,7 @@ public class CertificateController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Certificate> updateCertificate(@PathVariable String id, @RequestBody Certificate certificateDetails) {
+    public ResponseEntity<Certificate> updateCertificate(@PathVariable Integer id, @RequestBody Certificate certificateDetails) {
         try {
             return ResponseEntity.ok(certificateService.updateCertificate(id, certificateDetails));
         } catch (RuntimeException e) {
@@ -41,7 +41,7 @@ public class CertificateController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCertificate(@PathVariable String id) {
+    public ResponseEntity<Void> deleteCertificate(@PathVariable Integer id) {
         certificateService.deleteCertificate(id);
         return ResponseEntity.noContent().build();
     }

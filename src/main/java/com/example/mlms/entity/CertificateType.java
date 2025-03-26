@@ -1,17 +1,13 @@
 package com.example.mlms.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Table(name = "certificate_types")
-@Getter
-@Setter
 public class CertificateType {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "certificate_type_id") // Ensure the column name matches the database schema
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "certificate_type_id")
     private Integer certificateTypeId;
 
     @Column(nullable = false, unique = true)
@@ -19,5 +15,36 @@ public class CertificateType {
 
     private String description;
 
-    // Getters and setters...
+    public CertificateType() {
+    }
+
+    public CertificateType(Integer certificateTypeId, String typeName, String description) {
+        this.certificateTypeId = certificateTypeId;
+        this.typeName = typeName;
+        this.description = description;
+    }
+
+    public Integer getCertificateTypeId() {
+        return certificateTypeId;
+    }
+
+    public void setCertificateTypeId(Integer certificateTypeId) {
+        this.certificateTypeId = certificateTypeId;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
