@@ -139,10 +139,11 @@ public class CertificateService {
     }
 
     public List<CertificateType> initializeCertificateTypes() {
+        certificateRepository.deleteAll();
         List<CertificateType> defaultTypes = List.of(
             new CertificateType(1, "Birth Certificate", "Issued for birth registration"),
             new CertificateType(2, "Death Certificate", "Issued for death registration"),
-            new CertificateType(3, "Marriage Certificate", "Issued for marriage registration"),
+            new CertificateType(3, "dummyyy", "Issued for marriage registration"),
             new CertificateType(4, "Vaccination Certificate", "Issued for vaccination records"),
             new CertificateType(5, "Medical Fitness Certificate", "Issued for medical fitness verification"),
             new CertificateType(6, "Disability Certificate", "Issued for disability verification"),
@@ -153,9 +154,7 @@ public class CertificateService {
         List<CertificateType> savedTypes = new ArrayList<>();
 
         for(CertificateType type:defaultTypes){
-            if(certificateTypeRepository.findById(type.getCertificateTypeId()).isEmpty()){
-                savedTypes.add(certificateTypeRepository.save(type));
-            }
+            savedTypes.add(certificateTypeRepository.save(type));
         }
         return savedTypes;
     }
