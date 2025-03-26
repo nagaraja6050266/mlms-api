@@ -2,6 +2,7 @@ package com.example.mlms.entity;
 
 import jakarta.persistence.*;
 import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "patients")
@@ -19,6 +20,7 @@ public class Patient {
     private String address;
     private String admissionDate;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Certificate> certificates;
 

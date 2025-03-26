@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/certificates")
@@ -24,6 +26,11 @@ public class CertificateController {
         return certificateService.getCertificateById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/types")
+    public ResponseEntity<?> getCertificateTypes(){
+        return ResponseEntity.ok(certificateService.getCertificateTypes());
     }
 
     @PostMapping
@@ -44,5 +51,40 @@ public class CertificateController {
     public ResponseEntity<Void> deleteCertificate(@PathVariable Integer id) {
         certificateService.deleteCertificate(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/initialize")
+    public ResponseEntity<?> initializeCertificateTypes() {
+        return ResponseEntity.ok(certificateService.initializeCertificateTypes());
+    }
+
+    @GetMapping("/patient/{patientId}")
+    public ResponseEntity<List<Certificate>> getCertificatesByPatientId(@PathVariable Integer patientId) {
+        return ResponseEntity.ok(certificateService.getCertificatesByPatientId(patientId));
+    }
+
+    @GetMapping("/type/")
+    public ResponseEntity<List<Certificate>> getCertificatesByType(@RequestParam("type") String type) {
+        return ResponseEntity.ok(certificateService.getCertificatesByType(type));
+    }
+
+    @GetMapping("/issued-after/{date}")
+    public ResponseEntity<List<Certificate>> getCertificatesIssuedAfter(@PathVariable String date) {
+        return ResponseEntity.ok(certificateService.getCertificatesIssuedAfter(LocalDate.parse(date)));
+    }
+
+    @GetMapping("/validity/{id}")
+    public ResponseEntity<Boolean> isCertificateValid(@PathVariable Integer id) {
+        return ResponseEntity.ok(certificateService.isCertificateValid(id));
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Long>> getCertificateCountByType() {
+        return ResponseEntity.ok(certificateService.getCertificateCountByType());
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Certificate>> searchCertificates(@RequestParam String keyword) {
+        return ResponseEntity.ok(certificateService.searchCertificates(keyword));
     }
 }

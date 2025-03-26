@@ -10,6 +10,8 @@ import java.util.Set;
 
 import org.springframework.cglib.core.Local;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "certificates")
 @Getter

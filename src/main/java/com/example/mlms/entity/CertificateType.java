@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 @Table(name = "certificate_types")
 public class CertificateType {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "certificate_type_id")
     private Integer certificateTypeId;
 

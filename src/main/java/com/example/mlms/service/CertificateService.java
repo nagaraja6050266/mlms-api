@@ -1,7 +1,10 @@
 package com.example.mlms.service;
 
 import com.example.mlms.entity.Certificate;
+import com.example.mlms.entity.CertificateType;
 import com.example.mlms.repository.CertificateRepository;
+import com.example.mlms.repository.CertificateTypeRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +15,9 @@ import java.util.*;
 public class CertificateService {
     @Autowired
     private CertificateRepository certificateRepository;
+
+    @Autowired
+    private CertificateTypeRepository certificateTypeRepository;
 
     public List<Certificate> getAllCertificates() {
         return certificateRepository.findAll();
@@ -121,10 +127,36 @@ public class CertificateService {
         List<Certificate> certificates = certificateRepository.findAll();
         List<Certificate> filteredCertificates = new ArrayList<>();
         for (Certificate certificate : certificates) {
-            if (certificate.getCertificateType().getTypeName().contains(keyword) || certificate.getFilePath().contains(keyword)) {
+            if (certificate.getCertificateType().getTypeName().toLowerCase().contains(keyword.toLowerCase()) || certificate.getFilePath().toLowerCase().contains(keyword.toLowerCase())) {
                 filteredCertificates.add(certificate);
             }
         }
         return filteredCertificates;
+    }
+
+    public List<CertificateType> getCertificateTypes(){
+        return certificateTypeRepository.findAll();
+    }
+
+    public List<CertificateType> initializeCertificateTypes() {
+        List<CertificateType> defaultTypes = List.of(
+            new CertificateType(1, "Birth Certificate", "Issued for birth registration"),
+            new CertificateType(2, "Death Certificate", "Issued for death registration"),
+            new CertificateType(3, "Marriage Certificate", "Issued for marriage registration"),
+            new CertificateType(4, "Vaccination Certificate", "Issued for vaccination records"),
+            new CertificateType(5, "Medical Fitness Certificate", "Issued for medical fitness verification"),
+            new CertificateType(6, "Disability Certificate", "Issued for disability verification"),
+            new CertificateType(7, "Blood Donation Certificate", "Issued for blood donation records"),
+            new CertificateType(8, "Organ Donation Certificate", "Issued for organ donation records")
+        );
+
+        List<CertificateType> savedTypes = new ArrayList<>();
+
+        for(CertificateType type:defaultTypes){
+            if(certificateTypeRepository.findById(type.getCertificateTypeId()).isEmpty()){
+                savedTypes.add(certificateTypeRepository.save(type));
+            }
+        }
+        return savedTypes;
     }
 }
