@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +33,13 @@ public class CertificateController {
     }
 
     @PostMapping
-    public Certificate createCertificate(@RequestBody Certificate certificate) {
-        return certificateService.createCertificate(certificate);
+    public ResponseEntity<?> createCertificate(@RequestBody Map<String, Object> request) {
+        try {
+            Certificate certificate = certificateService.createCertificate(request);
+            return ResponseEntity.ok(certificate);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")

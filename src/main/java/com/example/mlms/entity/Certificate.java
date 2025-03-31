@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Set;
 
 import org.springframework.cglib.core.Local;
@@ -26,21 +24,24 @@ public class Certificate {
     private CertificateType certificateType;
 
     @Column(nullable = false)
-    private LocalDate issuedDate;
+    private String issuedDate;
 
     @Column(nullable = false)
     private String filePath;
 
-    private LocalDate expiryDate;
+    private String expiryDate;
 
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
+    @Transient // This field will not be persisted in the database
+    private Object certificateDetails;
+
     public Certificate() {
     }
 
-    public Certificate(Integer certificateId, CertificateType certificateType, LocalDate issuedDate, String filePath) {
+    public Certificate(Integer certificateId, CertificateType certificateType, String issuedDate, String filePath) {
         this.certificateId = certificateId;
         this.certificateType = certificateType;
         this.issuedDate = issuedDate;
@@ -63,11 +64,11 @@ public class Certificate {
         this.certificateType = certificateType;
     }
 
-    public LocalDate getIssuedDate() {
+    public String getIssuedDate() {
         return issuedDate;
     }
 
-    public void setIssuedDate(LocalDate issuedDate) {
+    public void setIssuedDate(String issuedDate) {
         this.issuedDate = issuedDate;
     }
 
@@ -80,11 +81,11 @@ public class Certificate {
         this.filePath = filePath;
     }
 
-    public LocalDate getExpiryDate() {
+    public String getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(LocalDate expiryDate) {
+    public void setExpiryDate(String expiryDate) {
         this.expiryDate = expiryDate;
     }
 
@@ -94,5 +95,13 @@ public class Certificate {
 
     public void setPatient(Patient patient) {
         this.patient = patient;
+    }
+
+    public Object getCertificateDetails() {
+        return certificateDetails;
+    }
+
+    public void setCertificateDetails(Object certificateDetails) {
+        this.certificateDetails = certificateDetails;
     }
 }

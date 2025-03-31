@@ -1,9 +1,19 @@
 package com.example.mlms.service;
 
+import jakarta.transaction.Transactional;
+
 import com.example.mlms.entity.Certificate;
 import com.example.mlms.entity.CertificateType;
+import com.example.mlms.repository.BirthCertificateRepository;
 import com.example.mlms.repository.CertificateRepository;
 import com.example.mlms.repository.CertificateTypeRepository;
+import com.example.mlms.entity.BirthCertificate;
+import com.example.mlms.entity.VaccinationCertificate;
+import com.example.mlms.entity.LabReport;
+import com.example.mlms.repository.LabReportRepository;
+import com.example.mlms.repository.PatientRepository;
+import com.example.mlms.repository.VaccinationCertificateRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,26 +27,86 @@ public class CertificateService {
     private CertificateRepository certificateRepository;
 
     @Autowired
+    private PatientRepository patientRepository;
+
+    @Autowired
+    private VaccinationCertificateRepository vaccinationCertificateRepository;
+
+    @Autowired
+    private BirthCertificateRepository birthCertificateRepository;
+
+    @Autowired
+    private LabReportRepository labReportRepository;
+
+    @Autowired
     private CertificateTypeRepository certificateTypeRepository;
 
     public List<Certificate> getAllCertificates() {
-        return certificateRepository.findAll();
+        List<Certificate> certificates = certificateRepository.findAll();
+        for(Certificate certificate:certificates){
+            certificate.setCertificateDetails(getCertificateDetails(certificate.getCertificateId()));
+        }
+        return certificates;
     }
 
     public Optional<Certificate> getCertificateById(Integer id) {
-        return certificateRepository.findById(id);
+        return certificateRepository.findById(id).map(certificate -> {
+            certificate.setCertificateDetails(getCertificateDetails(certificate.getCertificateId()));
+            return certificate;
+        });
     }
 
-    public Certificate createCertificate(Certificate certificate) {
-        return certificateRepository.save(certificate);
+    @Transactional
+    public Certificate createCertificate(Map<String, Object> request) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Extract common certificate fields
+        Certificate certificate = new Certificate();
+        certificate.setIssuedDate(request.get("issuedDate").toString()); // Changed to String
+        certificate.setFilePath(request.get("filePath").toString());
+        certificate.setExpiryDate(request.get("expiryDate").toString()); // Changed to String
+        certificate.setCertificateType(certificateTypeRepository.findById(
+            Integer.parseInt(((Map<String, Object>) request.get("certificateType")).get("certificateTypeId").toString())
+        ).orElseThrow(() -> new RuntimeException("Invalid certificate type")));
+        certificate.setPatient(patientRepository.findById(
+            Integer.parseInt(((Map<String, Object>) request.get("patient")).get("patientId").toString())
+        ).orElseThrow(() -> new RuntimeException("Invalid patient ID")));
+
+        // Save the certificate to generate the ID
+        certificate = certificateRepository.save(certificate);
+
+        // Handle specific certificate details based on type
+        Integer typeId = certificate.getCertificateType().getCertificateTypeId();
+        Map<String, Object> certificateDetails = (Map<String, Object>) request.get("certificateDetails");
+
+        Object certificateDetailsObj;
+        if (typeId == 1) { // Birth Certificate
+            BirthCertificate birthCertificate = mapper.convertValue(certificateDetails, BirthCertificate.class);
+            birthCertificate.setCertificateId(certificate.getCertificateId());
+            certificateDetailsObj = birthCertificateRepository.save(birthCertificate);
+        } else if (typeId == 2) { // Vaccination Certificate
+            VaccinationCertificate vaccinationCertificate = mapper.convertValue(certificateDetails, VaccinationCertificate.class);
+            vaccinationCertificate.setCertificateId(certificate.getCertificateId());
+            certificateDetailsObj= vaccinationCertificateRepository.save(vaccinationCertificate);
+        } else if (typeId == 3) { // Lab Reports
+            LabReport labReport = mapper.convertValue(certificateDetails, LabReport.class);
+            labReport.setCertificateId(certificate.getCertificateId());
+            certificateDetailsObj = labReportRepository.save(labReport);
+        } else {
+            throw new RuntimeException("Unsupported certificate type");
+        }
+        certificate.setCertificateDetails(certificateDetailsObj);
+        return certificate;
     }
 
     public Certificate updateCertificate(Integer id, Certificate certificateDetails) {
         return certificateRepository.findById(id).map(certificate -> {
-            certificate.setIssuedDate(certificateDetails.getIssuedDate());
+            certificate.setIssuedDate(certificateDetails.getIssuedDate()); // Changed to String
             certificate.setFilePath(certificateDetails.getFilePath());
             certificate.setCertificateType(certificateDetails.getCertificateType());
-            return certificateRepository.save(certificate);
+            Certificate cert = certificateRepository.save(certificate);
+            cert.setCertificateDetails(getCertificateDetails(cert.getCertificateId()));
+            return cert;
         }).orElseThrow(() -> new RuntimeException("Certificate not found"));
     }
 
@@ -77,11 +147,11 @@ public class CertificateService {
         return filteredCertificates;
     }
 
-    public List<Certificate> getCertificatesIssuedAfter(LocalDate date) {
+    public List<Certificate> getCertificatesIssuedAfter(String date) { // Changed parameter to String
         List<Certificate> certificates = certificateRepository.findAll();
         List<Certificate> filteredCertificates = new ArrayList<>();
         for (Certificate certificate : certificates) {
-            if (certificate.getIssuedDate().isAfter(date)) {
+            if (LocalDate.parse(certificate.getIssuedDate()).isAfter(LocalDate.parse(date))) { // Parse String to LocalDate for comparison
                 filteredCertificates.add(certificate);
             }
         }
@@ -91,7 +161,7 @@ public class CertificateService {
     public boolean isCertificateValid(Integer id) {
         Optional<Certificate> certificate = certificateRepository.findById(id);
         if (certificate.isPresent()) {
-            return certificate.get().getExpiryDate().isAfter(LocalDate.now());
+            return LocalDate.parse(certificate.get().getExpiryDate()).isAfter(LocalDate.now()); // Parse String to LocalDate for comparison
         }
         return false;
     }
@@ -111,6 +181,7 @@ public class CertificateService {
         List<Certificate> filteredCertificates = new ArrayList<>();
         for (Certificate certificate : certificates) {
             if (certificate.getPatient().getPatientId().equals(patientId)) {
+                certificate.setCertificateDetails(getCertificateDetails(certificate.getCertificateId()));
                 filteredCertificates.add(certificate);
             }
         }
@@ -128,6 +199,7 @@ public class CertificateService {
         List<Certificate> filteredCertificates = new ArrayList<>();
         for (Certificate certificate : certificates) {
             if (certificate.getCertificateType().getTypeName().toLowerCase().contains(keyword.toLowerCase()) || certificate.getFilePath().toLowerCase().contains(keyword.toLowerCase())) {
+                certificate.setCertificateDetails(getCertificateDetails(certificate.getCertificateId()));
                 filteredCertificates.add(certificate);
             }
         }
@@ -142,9 +214,9 @@ public class CertificateService {
         certificateRepository.deleteAll();
         List<CertificateType> defaultTypes = List.of(
             new CertificateType(1, "Birth Certificate", "Issued for birth registration"),
-            new CertificateType(2, "Death Certificate", "Issued for death registration"),
-            new CertificateType(3, "dummyyy", "Issued for marriage registration"),
-            new CertificateType(4, "Vaccination Certificate", "Issued for vaccination records"),
+            new CertificateType(2, "Vaccination Certificate", "Issued for vaccination records"),
+            new CertificateType(3, "Lab Reports", "Issued for Lab Reports"),
+            new CertificateType(4, "Death Certificate", "Issued for death records"),
             new CertificateType(5, "Medical Fitness Certificate", "Issued for medical fitness verification"),
             new CertificateType(6, "Disability Certificate", "Issued for disability verification"),
             new CertificateType(7, "Blood Donation Certificate", "Issued for blood donation records"),
@@ -153,9 +225,24 @@ public class CertificateService {
 
         List<CertificateType> savedTypes = new ArrayList<>();
 
-        for(CertificateType type:defaultTypes){
+        for (CertificateType type : defaultTypes) {
             savedTypes.add(certificateTypeRepository.save(type));
         }
         return savedTypes;
+    }
+
+    public Object getCertificateDetails(Integer id) {
+        Certificate certificate = certificateRepository.findById(id).orElseThrow(() -> new RuntimeException("Certificate not found"));
+        Integer typeId = certificate.getCertificateType().getCertificateTypeId();
+        switch(typeId) {
+            case 1:
+                return birthCertificateRepository.findById(id).orElseThrow(() -> new RuntimeException("Certificate details not found"));
+            case 2:
+                return vaccinationCertificateRepository.findById(id).orElseThrow(() -> new RuntimeException("Certificate details not found"));
+            case 3:
+                return labReportRepository.findById(id).orElseThrow(() -> new RuntimeException("Certificate details not found"));
+            default:
+                throw new RuntimeException("Unsupported certificate type");
+        }
     }
 }
