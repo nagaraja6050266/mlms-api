@@ -77,7 +77,7 @@ public class CertificateController {
         return ResponseEntity.ok(certificateService.getCertificateCountByType());
     }
 
-    @PostMapping("/search")
+    @GetMapping("/search")
     public ResponseEntity<List<Certificate>> searchCertificates(@RequestParam String keyword) {
         return ResponseEntity.ok(certificateService.searchCertificates(keyword));
     }
