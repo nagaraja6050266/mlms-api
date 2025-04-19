@@ -67,8 +67,8 @@ public class CertificateController {
         return ResponseEntity.ok(certificateService.getCertificatesByPatientId(patientId));
     }
 
-    @GetMapping("/type/")
-    public ResponseEntity<List<Certificate>> getCertificatesByType(@RequestParam("type") String type) {
+    @GetMapping("/type")
+    public ResponseEntity<List<Certificate>> getCertificatesByType(@RequestParam("type") Integer type) {
         return ResponseEntity.ok(certificateService.getCertificatesByType(type));
     }
 

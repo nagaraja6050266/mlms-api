@@ -136,11 +136,11 @@ public class CertificateService {
         return patientCertificateMap;
     }
 
-    public List<Certificate> getCertificatesByType(String certificateType) {
+    public List<Certificate> getCertificatesByType(Integer certificateType) {
         List<Certificate> certificates = certificateRepository.findAll();
         List<Certificate> filteredCertificates = new ArrayList<>();
         for (Certificate certificate : certificates) {
-            if (certificate.getCertificateType().getTypeName().equalsIgnoreCase(certificateType)) {
+            if (Objects.equals(certificate.getCertificateType().getCertificateTypeId(), certificateType)) {
                 filteredCertificates.add(certificate);
             }
         }
