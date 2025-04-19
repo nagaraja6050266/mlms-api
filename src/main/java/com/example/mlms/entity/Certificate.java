@@ -36,6 +36,7 @@ public class Certificate {
     private Patient patient;
 
     @Transient // This field will not be persisted in the database
+//    @JsonIgnore // Prevent infinite nesting in the response
     private Object certificateDetails;
 
     public Certificate() {
