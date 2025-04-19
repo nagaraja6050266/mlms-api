@@ -53,11 +53,17 @@ public class PatientController {
     }
 
     @PostMapping("/send-otp")
-    public ResponseEntity<String> sendOtp(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> request) {
         String mobileNumber = request.get("mobileNumber");
         if (mobileNumber == null || mobileNumber.isEmpty()) {
             return ResponseEntity.badRequest().body("Mobile number is required");
         }
+
+        //Developer chk
+        if( mobileNumber.equals("12345")){
+            return ResponseEntity.ok("Developer OTP request");
+        }
+
         otpService.generateOtp(mobileNumber);
         return ResponseEntity.ok("OTP sent successfully");
     }

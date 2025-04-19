@@ -20,6 +20,6 @@ public class OtpService {
     }
 
     public boolean verifyOtp(String mobileNumber, String otp) {
-        return otp.equals(otpStorage.get(mobileNumber));
+        return otpStorage.remove(mobileNumber,otp);
     }
 }
