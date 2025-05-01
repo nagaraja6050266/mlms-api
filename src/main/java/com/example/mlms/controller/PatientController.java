@@ -55,6 +55,7 @@ public class PatientController {
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> request) {
         String mobileNumber = request.get("mobileNumber");
+        String msgBody = request.get("msg");
         if (mobileNumber == null || mobileNumber.isEmpty()) {
             return ResponseEntity.badRequest().body("Mobile number is required");
         }
@@ -64,7 +65,9 @@ public class PatientController {
             return ResponseEntity.ok("Developer OTP request");
         }
 
-        otpService.generateOtp(mobileNumber);
+        mobileNumber = otpService.append(mobileNumber);
+
+        otpService.generateOtp(mobileNumber,msgBody);
         return ResponseEntity.ok("OTP sent successfully");
     }
 
@@ -75,6 +78,7 @@ public class PatientController {
         if (mobileNumber == null || otp == null || mobileNumber.isEmpty() || otp.isEmpty()) {
             return ResponseEntity.badRequest().body("Mobile number and OTP are required");
         }
+        mobileNumber = otpService.append(mobileNumber);
         boolean isValid = otpService.verifyOtp(mobileNumber, otp);
         if (isValid) {
             return ResponseEntity.ok("OTP verified successfully");
